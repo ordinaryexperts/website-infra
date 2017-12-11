@@ -1,15 +1,17 @@
 terraform {
   backend "s3" {
     bucket  = "oe-prod-tf-state-us-west-2"
-    key     = "prod1/terraform.tfstate"
+    key     = "dev1/terraform.tfstate"
     region  = "us-west-2"
     profile = "oe-prod-us-west-2"
   }
 }
 
+variable "cert_arn" {}
 variable "env" {}
 variable "profile" {}
 variable "region" {}
+variable "url" {}
 
 provider "aws" {
   profile = "${var.profile}"
@@ -19,6 +21,7 @@ provider "aws" {
 
 module "website" {
   source = "../../../modules/website"
+  cert_arn = "${var.cert_arn}"
   env = "${var.env}"
-  url = "ordinaryexperts.com"
+  url = "${var.url}"
 }
