@@ -1,5 +1,35 @@
 AWSTemplateFormatVersion: '2010-09-09'
 
-Resources:
+Parameters:
 
-Outputs:
+  PipelineBucket:
+    Type: String
+
+  SourceCodeCommitRepoArn:
+    Type: String
+
+Resources:
+  CodeBuildRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          -
+            Effect: Allow
+            Principal:
+              Service:
+                - codebuild.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: "/"
+      Policies:
+        -
+          PolicyName: codebuild-service
+          PolicyDocument:
+            Statement:
+              -
+                Effect: Allow
+                # TODO: limit actions and resources to final needed
+                Action: "*"
+                Resource: "*"
+            Version: '2012-10-17'

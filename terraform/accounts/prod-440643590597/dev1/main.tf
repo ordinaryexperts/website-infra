@@ -8,6 +8,7 @@ terraform {
 }
 
 variable "cert_arn" {}
+variable "code_commit_repo_arn" {}
 variable "env" {}
 variable "profile" {}
 variable "region" {}
@@ -22,6 +23,7 @@ provider "aws" {
 module "website" {
   source = "../../../modules/website"
   cert_arn = "${var.cert_arn}"
+  code_commit_repo_arn = "${var.code_commit_repo_arn}"
   env = "${var.env}"
   url = "${var.url}"
 }
