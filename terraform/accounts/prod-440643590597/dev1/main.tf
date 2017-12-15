@@ -8,7 +8,8 @@ terraform {
 }
 
 variable "cert_arn" {}
-variable "code_commit_repo_arn" {}
+variable "code_commit_repo_branch" {}
+variable "code_commit_repo_name" {}
 variable "env" {}
 variable "profile" {}
 variable "region" {}
@@ -23,7 +24,8 @@ provider "aws" {
 module "website" {
   source = "../../../modules/website"
   cert_arn = "${var.cert_arn}"
-  code_commit_repo_arn = "${var.code_commit_repo_arn}"
+  code_commit_repo_branch = "${var.code_commit_repo_branch}"
+  code_commit_repo_name = "${var.code_commit_repo_name}"
   env = "${var.env}"
   url = "${var.url}"
 }

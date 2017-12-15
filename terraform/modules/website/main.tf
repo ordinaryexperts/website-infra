@@ -1,4 +1,5 @@
-variable "code_commit_repo_arn" {}
+variable "code_commit_repo_branch" {}
+variable "code_commit_repo_name" {}
 variable "cert_arn" {}
 variable "env" {}
 variable "url" {}
@@ -25,7 +26,9 @@ resource "aws_cloudformation_stack" "website_cicd" {
   on_failure = "DELETE"
   parameters {
     PipelineBucket = "${aws_cloudformation_stack.pipeline_bucket.outputs["PipelineBucket"]}"
-    SourceCodeCommitRepoArn = "${var.url}"
+    SourceCodeCommitRepoBranch = "${var.code_commit_repo_branch}"
+    SourceCodeCommitRepoName = "${var.code_commit_repo_name}"
+    WebsiteBucket = "${aws_cloudformation_stack.website_bucket_and_cf.outputs["WebsiteBucket"]}"
   }
   template_body = "${file("${path.module}/website_cicd.yaml")}"
 }
