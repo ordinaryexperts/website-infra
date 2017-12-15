@@ -125,3 +125,6 @@ Outputs:
 
   CloudFrontDistributionDomain:
     Value: !GetAtt CloudFrontDistribution.DomainName
+
+  CloudFrontDistributionId:
+    Value: !Ref CloudFrontDistribution
