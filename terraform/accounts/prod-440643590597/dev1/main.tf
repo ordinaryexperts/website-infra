@@ -11,6 +11,7 @@ variable "cert_arn" {}
 variable "code_commit_repo_branch" {}
 variable "code_commit_repo_name" {}
 variable "env" {}
+variable "notification_email" {}
 variable "profile" {}
 variable "region" {}
 variable "url" {}
@@ -27,5 +28,6 @@ module "website" {
   code_commit_repo_branch = "${var.code_commit_repo_branch}"
   code_commit_repo_name = "${var.code_commit_repo_name}"
   env = "${var.env}"
+  notification_email = "${var.notification_email}"
   url = "${var.url}"
 }

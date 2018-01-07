@@ -19,6 +19,14 @@ Parameters:
 
 Resources:
 
+  DeployNotificationTopic:
+    Type: 'AWS::SNS::Topic'
+    Properties:
+      Subscription:
+        -
+          Endpoint: !Ref NotificationEmail
+          Protocol: 'email'
+
   CodeBuildRole:
     Type: AWS::IAM::Role
     Properties:
@@ -31,17 +39,18 @@ Resources:
                 - codebuild.amazonaws.com
             Action:
               - sts:AssumeRole
-      Path: "/"
+      Path: '/'
       Policies:
         -
           PolicyName: codebuild-service
           PolicyDocument:
+            # needs access to CodePipeline artifacts
             Statement:
               -
                 Effect: Allow
-                # TODO: limit actions and resources to final needed
-                Action: "*"
-                Resource: "*"
+                Action:
+                  - 'codebuild:StartBuild'
+                Resource: !Sub "arn:aws:codebuild:${AWS::Region}:${AWS::AccountId}:project/${AWS::StackName}-DeploySite"
             Version: '2012-10-17'
 
   CodePipelineRole:
@@ -56,7 +65,7 @@ Resources:
                 - codepipeline.amazonaws.com
             Action:
               - sts:AssumeRole
-      Path: "/"
+      Path: '/'
       Policies:
         -
           PolicyName: codepipeline-service
@@ -64,20 +73,24 @@ Resources:
             Statement:
               -
                 Action:
-                  - codebuild:*
-                Resource: "*"
+                  - codebuild:StartBuild
+                Resource: !Sub "arn:aws:codebuild:${AWS::Region}:${AWS::AccountId}:project/${CodeBuildDeploySite}"
                 Effect: Allow
               -
                 Action:
-                  - codecommit:*
-                Resource: "*"
+                  - codecommit:GetBranch
+                  - codecommit:GetCommit
+                  - codecommit:UploadArchive
+                  - codecommit:GetUploadArchiveStatus
+                  - codecommit:CancelUploadArchive
+                Resource: !Sub "arn:aws:codecommit:${AWS::Region}:${AWS::AccountId}:${SourceCodeCommitRepoName}"
                 Effect: Allow
               -
                 Action:
                   - s3:GetObject
                   - s3:GetObjectVersion
                   - s3:GetBucketVersioning
-                Resource: "*"
+                Resource: !Ref WebsiteBucket
                 Effect: Allow
               -
                 Action:
@@ -87,10 +100,8 @@ Resources:
                 Effect: Allow
               -
                 Action:
-                  - s3:*
-                  - cloudformation:*
                   - iam:PassRole
-                Resource: "*"
+                Resource: '*'
                 Effect: Allow
             Version: '2012-10-17'
 
