@@ -2,7 +2,6 @@ variable "code_commit_repo_branch" {}
 variable "code_commit_repo_name" {}
 variable "cert_arn" {}
 variable "env" {}
-variable "notification_email" {}
 variable "url" {}
 
 resource "aws_cloudformation_stack" "website_bucket_and_cf" {
@@ -28,7 +27,6 @@ resource "aws_cloudformation_stack" "website_cicd" {
   on_failure = "DELETE"
   parameters {
     CloudFrontDistributionId = "${aws_cloudformation_stack.website_bucket_and_cf.outputs["CloudFrontDistributionId"]}"
-    NotificationEmail = "${var.notification_email}"
     PipelineBucket = "${aws_cloudformation_stack.pipeline_bucket.outputs["PipelineBucket"]}"
     SourceCodeCommitRepoBranch = "${var.code_commit_repo_branch}"
     SourceCodeCommitRepoName = "${var.code_commit_repo_name}"

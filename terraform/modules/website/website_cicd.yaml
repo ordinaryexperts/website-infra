@@ -19,14 +19,6 @@ Parameters:
 
 Resources:
 
-  DeployNotificationTopic:
-    Type: 'AWS::SNS::Topic'
-    Properties:
-      Subscription:
-        -
-          Endpoint: !Ref NotificationEmail
-          Protocol: 'email'
-
   CodeBuildRole:
     Type: AWS::IAM::Role
     Properties:
