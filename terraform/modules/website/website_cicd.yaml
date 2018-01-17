@@ -31,17 +31,52 @@ Resources:
                 - codebuild.amazonaws.com
             Action:
               - sts:AssumeRole
-      Path: "/"
+      Path: '/'
       Policies:
         -
           PolicyName: codebuild-service
           PolicyDocument:
             Statement:
               -
+                Sid: AllowBuilds
+                Action:
+                  - 'codebuild:StartBuild'
                 Effect: Allow
-                # TODO: limit actions and resources to final needed
-                Action: "*"
-                Resource: "*"
+                Resource: !Sub "arn:aws:codebuild:${AWS::Region}:${AWS::AccountId}:project/${AWS::StackName}-DeploySite"
+              -
+                Sid: AllowLogging
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                  - logs:DescribeLogStreams
+                Effect: Allow
+                Resource: !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/${AWS::StackName}-DeploySite:*"
+              -
+                Sid: AllowDownloadArtifacts
+                Action:
+                  - s3:GetObject
+                  - s3:GetObjectVersion
+                Resource:
+                  - !Sub "arn:aws:s3:::${PipelineBucket}/*SourceOutp*"
+                Effect: Allow
+              -
+                Sid: AllowUpdateWebsite
+                Action:
+                  - s3:PutObject
+                  - s3:PutObjectAcl
+                Resource:
+                  - !Sub "arn:aws:s3:::${WebsiteBucket}/*"
+                Effect: Allow
+              -
+                Sid: AllowCloudFrontInvalidation
+                Action:
+                  - cloudfront:CreateInvalidation
+                Resource:
+                  # CloudFront doesn't support resource-level policies:
+                  # https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_aws-services-that-work-with-iam.html#networking_svcs
+                  - "*"
+                Effect: Allow
             Version: '2012-10-17'
 
   CodePipelineRole:
@@ -56,41 +91,47 @@ Resources:
                 - codepipeline.amazonaws.com
             Action:
               - sts:AssumeRole
-      Path: "/"
+      Path: '/'
       Policies:
         -
           PolicyName: codepipeline-service
           PolicyDocument:
             Statement:
               -
+                Sid: AllowCodeBuildIntegration
+                Effect: Allow
                 Action:
-                  - codebuild:*
-                Resource: "*"
+                  - codebuild:StartBuild
+                  - codebuild:BatchGetBuilds # Added because of an error in build logs showing access was denied on this action.
+                Resource: !Sub "arn:aws:codebuild:${AWS::Region}:${AWS::AccountId}:project/${CodeBuildDeploySite}"
+
+              # https://docs.aws.amazon.com/codecommit/latest/userguide/auth-and-access-control-permissions-reference.html#aa-acp
+              -
+                Sid: AllowCodeCommitIntegration
+                Effect: Allow
+                Action:
+                  - codecommit:GetBranch
+                  - codecommit:GetCommit
+                  - codecommit:UploadArchive
+                  - codecommit:GetUploadArchiveStatus
+                  - codecommit:CancelUploadArchive
+                Resource: !Sub "arn:aws:codecommit:${AWS::Region}:${AWS::AccountId}:${SourceCodeCommitRepoName}"
+
+              -
+                Sid: AllowGetVersioningOnPipelineBucket
+                Action:
+                  - s3:GetBucketVersioning
+                Resource:
+                  - !Sub "arn:aws:s3:::${PipelineBucket}"
                 Effect: Allow
               -
-                Action:
-                  - codecommit:*
-                Resource: "*"
-                Effect: Allow
-              -
+                Sid: AllowPipelineArtifactStorage
                 Action:
                   - s3:GetObject
                   - s3:GetObjectVersion
-                  - s3:GetBucketVersioning
-                Resource: "*"
-                Effect: Allow
-              -
-                Action:
                   - s3:PutObject
                 Resource:
-                  - arn:aws:s3:::codepipeline*
-                Effect: Allow
-              -
-                Action:
-                  - s3:*
-                  - cloudformation:*
-                  - iam:PassRole
-                Resource: "*"
+                  - !Sub "arn:aws:s3:::${PipelineBucket}/*"
                 Effect: Allow
             Version: '2012-10-17'
 
