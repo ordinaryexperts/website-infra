@@ -102,7 +102,7 @@ Resources:
                 Effect: Allow
                 Action:
                   - codebuild:StartBuild
-                  - codebuild:BatchGetBuilds
+                  - codebuild:BatchGetBuilds # Added because of an error in build logs showing access was denied on this action.
                 Resource: !Sub "arn:aws:codebuild:${AWS::Region}:${AWS::AccountId}:project/${CodeBuildDeploySite}"
 
               # https://docs.aws.amazon.com/codecommit/latest/userguide/auth-and-access-control-permissions-reference.html#aa-acp
