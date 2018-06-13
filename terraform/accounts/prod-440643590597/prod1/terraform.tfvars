@@ -1,3 +1,7 @@
+cert_arn = "arn:aws:acm:us-east-1:440643590597:certificate/09a18550-542e-4591-bfbb-e35be2befd7c"
+code_commit_repo_branch = "master"
+code_commit_repo_name = "website"
 env = "prod1"
 profile = "oe-prod-us-west-2"
 region = "us-west-2"
+url = "ordinaryexperts.com"
