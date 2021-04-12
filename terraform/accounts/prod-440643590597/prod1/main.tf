@@ -9,8 +9,9 @@ terraform {
 locals {
   cert_arn                           = "arn:aws:acm:us-east-1:440643590597:certificate/09a18550-542e-4591-bfbb-e35be2befd7c"
   code_build_docker_image_identifier = "aws/codebuild/ruby:2.5.3"
-  code_commit_repo_branch            = "master"
-  code_commit_repo_name              = "website-ordinaryexpertsdotcom"
+  code_star_connection_arn           = "arn:aws:codestar-connections:us-west-2:440643590597:connection/d467e934-62c9-4097-aacd-b19b32837f05"
+  repo_branch                        = "master"
+  repo_name                          = "ordinaryexperts/website-ordinaryexpertsdotcom"
   custom_error_response_page_path    = "/errors/404.html"
   domain                             = "ordinaryexperts.com"
   env                                = "prod1"
@@ -25,14 +26,14 @@ provider "aws" {
 
 module "website" {
   source  = "ordinaryexperts/static-website-with-cicd/aws"
-  version = "3.0.0"
+  version = "4.0.0"
 
   cert_arn = local.cert_arn
   code_build_docker_image_identifier = local.code_build_docker_image_identifier
-  code_commit_repo_branch = local.code_commit_repo_branch
-  code_commit_repo_name = local.code_commit_repo_name
   custom_error_response_page_path = local.custom_error_response_page_path
   domain = local.domain
   env = local.env
   notification_email = local.notification_email
+  repo_branch = local.repo_branch
+  repo_name = local.repo_name
 }
