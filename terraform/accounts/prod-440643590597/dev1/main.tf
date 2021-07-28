@@ -27,7 +27,7 @@ provider "aws" {
 
 module "website" {
   source  = "ordinaryexperts/static-website-with-cicd/aws"
-  version = "4.0.0"
+  version = "4.1.1"
 
   cert_arn = local.cert_arn
   code_build_docker_image_identifier = local.code_build_docker_image_identifier
